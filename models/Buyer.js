@@ -6,8 +6,8 @@ const buyerSchema = new Schema(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    address: { type: String, required: true },
-    phoneNumber: { type: String, required: true },
+    address: { type: String, required: false },
+    phoneNumber: { type: String, required: false },
     orders: [{ type: Schema.Types.ObjectId, ref: "Order" }],
   },
   { timestamps: true }

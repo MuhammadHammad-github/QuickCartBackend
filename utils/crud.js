@@ -11,7 +11,15 @@ const create = async (res, data, model) => {
 };
 const read = async (res, data, model) => {
   try {
-    const items = await model.find().populate("comments.userId");
+    const items = await model.find();
+    return response(res, 200, { message: "Data Fetched!", items });
+  } catch (error) {
+    return tryCatchError(res, error);
+  }
+};
+const readBy = async (res, query, model) => {
+  try {
+    const items = await model.find(query);
     return response(res, 200, { message: "Data Fetched!", items });
   } catch (error) {
     return tryCatchError(res, error);
@@ -23,7 +31,7 @@ const readOne = async (res, data, model) => {
     const { id } = data;
     if (!id) return response(res, 409, { message: "Id not received" });
 
-    const item = await model.findById(id).populate("comments.userId");
+    const item = await model.findById(id);
     if (!item) return response(res, 404, { message: "Item not found" });
 
     return response(res, 200, { message: "Data Fetched!", item });
@@ -51,6 +59,23 @@ const update = async (res, data, model, id) => {
     return tryCatchError(res, error);
   }
 };
+const pushUpdate = async (res, data, model, id, pushTo) => {
+  try {
+    if (!id) return response(res, 409, { message: "Id not received" });
+
+    const item = await model.findById(id);
+    if (!item) return response(res, 404, { message: "Item not found" });
+
+    const updateQuery = { $push: { [pushTo]: data } };
+    const updatedItem = await model.findByIdAndUpdate(id, updateQuery, {
+      new: true,
+    });
+
+    return response(res, 200, { message: "Data Updated!", updatedItem });
+  } catch (error) {
+    return tryCatchError(res, error);
+  }
+};
 
 const deleteItem = async (res, data, model) => {
   try {
@@ -65,4 +90,12 @@ const deleteItem = async (res, data, model) => {
     return tryCatchError(res, error);
   }
 };
-module.exports = { create, read, readOne, update, deleteItem };
+module.exports = {
+  create,
+  read,
+  readOne,
+  update,
+  deleteItem,
+  pushUpdate,
+  readBy,
+};

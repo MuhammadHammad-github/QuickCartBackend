@@ -10,6 +10,7 @@ const retailerSchema = new Schema(
     storeAddress: { type: String, required: true },
     phoneNumber: { type: String, required: true },
     products: [{ type: Schema.Types.ObjectId, ref: "Product" }],
+    allowed: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
