@@ -1,5 +1,7 @@
 require("dotenv").config();
 const express = require("express");
+const cors = require("cors");
+const path = require("path");
 const { connectToDb } = require("./utils");
 const {
   adminRoute,
@@ -7,6 +9,8 @@ const {
   orderRoute,
   productRoute,
   retailerRoute,
+  subCategoryRoute,
+  categoryRoute,
 } = require("./routes");
 const app = express();
 
@@ -21,6 +25,8 @@ app.use("/api/buyer", buyerRoute);
 app.use("/api/order", orderRoute);
 app.use("/api/product", productRoute);
 app.use("/api/retailer", retailerRoute);
+app.use("/api/category", categoryRoute);
+app.use("/api/subCategory", subCategoryRoute);
 
 app.listen(3000, () => {
   console.log("server started at port 3000");

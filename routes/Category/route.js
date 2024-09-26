@@ -1,15 +1,15 @@
 const express = require("express");
 const verifyAuthToken = require("../../middlewares/verifyAuthToken");
 const {
-  getProduct,
-  createProduct,
-  updateProduct,
-  getProductsByRetailer,
-  deleteProduct,
-} = require("../../controllers/ProductController");
+  getCategory,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+  getCategories,
+} = require("../../controllers/CategoryController");
 const upload = require("../../middlewares/uploadFile");
 const deleteFile = require("../../middlewares/deleteFile");
-const { Product } = require("../../models");
+const { Category } = require("../../models");
 const router = express.Router();
 
 const conditionalUpload = (req, res, next) => {
@@ -24,21 +24,16 @@ const conditionalDelete = (req, res, next) => {
   next();
 };
 
-router.get("/", getProduct);
-router.get("/retailerProducts", verifyAuthToken, getProductsByRetailer);
-router.post(
-  "/create",
-  verifyAuthToken,
-  upload.array("images", 5),
-  createProduct
-);
+router.get("/", getCategories);
+router.get("/one", getCategory);
+router.post("/create", verifyAuthToken, upload.single("image"), createCategory);
 router.put(
   "/update",
   verifyAuthToken,
   conditionalUpload,
   conditionalDelete,
-  updateProduct
+  updateCategory
 );
-router.delete("/delete", verifyAuthToken, deleteFile(Product), deleteProduct);
+router.delete("/delete", verifyAuthToken, deleteFile(Category), deleteCategory);
 
 module.exports = router;

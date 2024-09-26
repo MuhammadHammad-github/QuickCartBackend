@@ -1,44 +1,33 @@
 const fs = require("fs");
 const path = require("path");
-const Blog = require("../schema/Blog");
+const { mappingPaths } = require("../utils/deleteFileFn");
 
-const deleteFile = async (req, res, next) => {
-  try {
-    const blogId = req.headers["id"];
-    if (!blogId) {
-      return res.status(400).json({ msg: "No blog ID provided in headers" });
-    }
+const deleteFile = (Model) => {
+  return async (req, res, next) => {
+    try {
+      const itemId = req.headers["id"];
+      if (!itemId) {
+        return res.status(400).json({ msg: "No item ID provided in headers" });
+      }
 
-    const blog = await Blog.findById(blogId);
-    if (!blog) {
-      return res.status(404).json({ msg: "Blog not found" });
-    }
+      const item = await Model.findById(itemId); // Use the passed model
+      if (!item) {
+        return res.status(404).json({ msg: "item not found" });
+      }
 
-    const filePath = blog.image.filePath;
-    if (!filePath) {
-      return res.status(400).json({ msg: "No file path found in the blog" });
-    }
+      const filePaths = item.image;
+      if (!filePaths) {
+        return res.status(400).json({ msg: "No file path found in the item" });
+      }
 
-    const baseUrl = `${req.protocol}://${req.get("host")}`;
-    const relativePath = filePath.replace(baseUrl, "");
-    const absoluteFilePath = path.join(__dirname, "..", relativePath);
+      await mappingPaths(filePaths, req, res);
 
-    if (fs.existsSync(absoluteFilePath)) {
-      fs.unlink(absoluteFilePath, (err) => {
-        if (err) {
-          console.error("Error deleting file:", err);
-          return res.status(500).send("Error deleting file");
-        }
-        next();
-      });
-    } else {
-      console.error("File not found:", absoluteFilePath);
       next();
+    } catch (error) {
+      console.error(`Error in deleteFile: ${error.message}`);
+      return res.status(500).json({ msg: "Server Error" });
     }
-  } catch (error) {
-    console.error(`Error in deleteFile: ${error.message}`);
-    res.status(500).json({ msg: "Server Error" });
-  }
+  };
 };
 
 module.exports = deleteFile;
