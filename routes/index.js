@@ -5,6 +5,7 @@ const productRoute = require("./Product/route");
 const retailerRoute = require("./Retailer/route");
 const categoryRoute = require("./Category/route");
 const subCategoryRoute = require("./SubCategory/route");
+const slideRoute = require("./Slide/route");
 module.exports = {
   adminRoute,
   buyerRoute,
@@ -13,4 +14,5 @@ module.exports = {
   retailerRoute,
   categoryRoute,
   subCategoryRoute,
+  slideRoute,
 };

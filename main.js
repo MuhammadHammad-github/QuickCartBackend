@@ -11,6 +11,7 @@ const {
   retailerRoute,
   subCategoryRoute,
   categoryRoute,
+  slideRoute,
 } = require("./routes");
 const app = express();
 
@@ -21,6 +22,7 @@ app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/api/admin", adminRoute);
+app.use("/api/slide", slideRoute);
 app.use("/api/buyer", buyerRoute);
 app.use("/api/order", orderRoute);
 app.use("/api/product", productRoute);

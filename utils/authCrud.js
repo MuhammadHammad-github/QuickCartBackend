@@ -47,8 +47,12 @@ const getAccount = async (res, data, model) => {
   try {
     const { id } = data;
     if (!id) return response(res, 404, { message: "Id Not Received" });
-    const account = await model.findById(id);
-    if (!account) return response(res, 404, { message: "Account Not Found!" });
+    const account = await model.findById(id).select("-password");
+    if (!account)
+      return response(res, 404, {
+        message: "Account Not Found!",
+        action: "logout",
+      });
     return response(res, 200, { message: "Account Found!", account });
   } catch (error) {
     return tryCatchError(res, error);

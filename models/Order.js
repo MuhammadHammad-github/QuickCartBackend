@@ -4,7 +4,9 @@ const Schema = mongoose.Schema;
 const orderSchema = new Schema(
   {
     buyer: { type: Schema.Types.ObjectId, ref: "Buyer", required: true },
-    retailer: { type: Schema.Types.ObjectId, ref: "Retailer", required: true },
+    retailer: [
+      { type: Schema.Types.ObjectId, ref: "Retailer", required: true },
+    ],
     products: [
       {
         product: {
@@ -13,13 +15,13 @@ const orderSchema = new Schema(
           required: true,
         },
         quantity: { type: Number, required: true },
-        price: { type: Number, required: true },
+        color: { type: String, required: false },
       },
     ],
     totalAmount: { type: Number, required: true },
     status: {
       type: String,
-      enum: ["pending", "shipped", "delivered", "cancelled"],
+      enum: ["pending", "shipped", "delivered", "canceled"],
       default: "pending",
     },
     orderDate: { type: Date, default: Date.now },

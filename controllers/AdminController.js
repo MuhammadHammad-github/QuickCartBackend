@@ -1,7 +1,8 @@
 const { create, getAccount, login } = require("../utils/authCrud");
-const { Admin } = require("../models/");
+const { Admin, Retailer } = require("../models/");
 const tryCatchError = require("../utils/tryCatchError");
 const response = require("../utils/response");
+const { read, update, deleteItem } = require("../utils");
 
 const createAdmin = async (req, res) => {
   await create(res, req.body, Admin);
@@ -22,4 +23,17 @@ const checkAdmin = async (req, res) => {
 const getAdmin = async (req, res) => {
   await getAccount(res, { id: req.id }, Admin);
 };
-module.exports = { createAdmin, getAdmin, loginAdmin, checkAdmin };
+const approveRetailer = async (req, res) => {
+  await update(res, { allowed: true }, Retailer, req.headers["id"]);
+};
+const rejectRetailer = async (req, res) => {
+  await deleteItem(res, { id: req.headers["id"] }, Retailer);
+};
+module.exports = {
+  createAdmin,
+  getAdmin,
+  loginAdmin,
+  checkAdmin,
+  approveRetailer,
+  rejectRetailer,
+};

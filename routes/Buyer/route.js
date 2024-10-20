@@ -5,11 +5,15 @@ const {
   createBuyer,
   loginBuyer,
   updateBuyer,
+  getTotalBuyers,
+  getBuyers,
 } = require("../../controllers/BuyerController");
 
 const router = express.Router();
 router.get("/", verifyAuthToken, getBuyer);
+router.get("/all", getBuyers);
+router.get("/total", getTotalBuyers);
 router.post("/create", createBuyer);
 router.post("/login", loginBuyer);
-router.post("/update", verifyAuthToken, updateBuyer);
+router.put("/update", verifyAuthToken, updateBuyer);
 module.exports = router;

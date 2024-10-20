@@ -6,6 +6,14 @@ const {
   updateProduct,
   getProductsByRetailer,
   deleteProduct,
+  getProductsByCategory,
+  getProductsBySubCategory,
+  getProducts,
+  getTotalProducts,
+  getTotalProductsByRetailer,
+  featureUnFeatureProduct,
+  getFeaturedProducts,
+  getPopularProducts,
 } = require("../../controllers/ProductController");
 const upload = require("../../middlewares/uploadFile");
 const deleteFile = require("../../middlewares/deleteFile");
@@ -13,19 +21,33 @@ const { Product } = require("../../models");
 const router = express.Router();
 
 const conditionalUpload = (req, res, next) => {
+  console.log("Header", req.headers["content-type"]);
   if (req.headers["content-type"].startsWith("multipart/form-data")) {
-    return upload.single("image")(req, res, next);
+    return upload.array("images")(req, res, next);
   }
   next();
 };
-const conditionalDelete = (req, res, next) => {
-  if (req.headers["content-type"].startsWith("multipart/form-data"))
-    return deleteFile(req, res, next);
-  next();
+const conditionalDelete = (Model) => {
+  return (req, res, next) => {
+    const contentType = req.headers["content-type"];
+
+    if (contentType && contentType.startsWith("multipart/form-data")) {
+      return deleteFile(Model)(req, res, next);
+    }
+
+    next();
+  };
 };
 
 router.get("/", getProduct);
-router.get("/retailerProducts", verifyAuthToken, getProductsByRetailer);
+router.get("/all", getProducts);
+router.get("/totalProducts", getTotalProducts);
+router.get("/totalProductsByRetailer", getTotalProductsByRetailer);
+router.get("/retailerProducts", getProductsByRetailer);
+router.get("/byCategory", getProductsByCategory);
+router.get("/bySubCategory", getProductsBySubCategory);
+router.get("/featured", getFeaturedProducts);
+router.get("/popular", getPopularProducts);
 router.post(
   "/create",
   verifyAuthToken,
@@ -36,9 +58,10 @@ router.put(
   "/update",
   verifyAuthToken,
   conditionalUpload,
-  conditionalDelete,
+  conditionalDelete(Product),
   updateProduct
 );
 router.delete("/delete", verifyAuthToken, deleteFile(Product), deleteProduct);
+router.put("/featureUnFeature", verifyAuthToken, featureUnFeatureProduct);
 
 module.exports = router;

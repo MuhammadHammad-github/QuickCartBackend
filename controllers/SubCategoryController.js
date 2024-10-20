@@ -12,6 +12,7 @@ const {
   tryCatchError,
   readBy,
 } = require("../utils");
+const { deletingImages } = require("../utils/crud");
 
 const createSubCategory = async (req, res) => {
   try {
@@ -52,6 +53,7 @@ const getSubCategoriesByCategory = async (req, res) => {
   await readBy(res, { parentCategory: req.headers["id"] }, SubCategory);
 };
 const updateSubCategory = async (req, res) => {
+  console.log("body", req.body);
   const fullUrl = req.protocol + "://" + req.get("host");
   let query;
   if (req.file) {
@@ -72,6 +74,14 @@ const deleteSubCategory = async (req, res) => {
     req.headers["category"],
     "subCategories",
     false
+  );
+  await deletingImages(
+    res,
+    req,
+    Product,
+    "subCategory",
+    req.headers["id"],
+    "images"
   );
   await deleteManyItems(
     res,

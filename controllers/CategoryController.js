@@ -20,7 +20,7 @@ const createCategory = async (req, res) => {
   );
 };
 const getCategories = async (req, res) => {
-  await read(res, {}, Category);
+  await read(res, {}, Category, ["subCategories"]);
 };
 const getCategory = async (req, res) => {
   await readOne(res, { id: req.headers["id"] }, Category);

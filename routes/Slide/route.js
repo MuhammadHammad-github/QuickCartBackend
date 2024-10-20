@@ -1,15 +1,14 @@
 const express = require("express");
 const verifyAuthToken = require("../../middlewares/verifyAuthToken");
-const {
-  getCategory,
-  createCategory,
-  updateCategory,
-  deleteCategory,
-  getCategories,
-} = require("../../controllers/CategoryController");
 const upload = require("../../middlewares/uploadFile");
 const deleteFile = require("../../middlewares/deleteFile");
-const { Category } = require("../../models");
+const {
+  getSlides,
+  createSlide,
+  updateSlide,
+  deleteSlide,
+} = require("../../controllers/SlideController");
+const Slide = require("../../models/Slide");
 const router = express.Router();
 
 const conditionalUpload = (req, res, next) => {
@@ -30,16 +29,15 @@ const conditionalDelete = (Model) => {
   };
 };
 
-router.get("/", getCategories);
-router.get("/one", getCategory);
-router.post("/create", verifyAuthToken, upload.single("image"), createCategory);
+router.get("/", getSlides);
+router.post("/create", verifyAuthToken, upload.single("image"), createSlide);
 router.put(
   "/update",
   verifyAuthToken,
   conditionalUpload,
-  conditionalDelete(Category),
-  updateCategory
+  conditionalDelete(Slide),
+  updateSlide
 );
-router.delete("/delete", verifyAuthToken, deleteFile(Category), deleteCategory);
+router.delete("/delete", verifyAuthToken, deleteFile(Slide), deleteSlide);
 
 module.exports = router;

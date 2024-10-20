@@ -19,6 +19,11 @@ const productSchema = new Schema(
     images: [{ type: String, required: true }],
     colors: [{ type: String, required: false }],
     retailer: { type: Schema.Types.ObjectId, ref: "Retailer", required: true },
+    orders: [{ type: Schema.Types.ObjectId, ref: "Order" }],
+    featured: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

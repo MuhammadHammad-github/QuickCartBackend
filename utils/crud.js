@@ -5,6 +5,7 @@ const create = async (res, data, model, directReturn = true) => {
   try {
     console.log(data);
     const newItem = await model.create(data);
+    console.log("this is new Item", newItem);
     if (directReturn)
       return response(res, 200, { message: "Created Successfully!" });
     else return newItem;
@@ -12,23 +13,47 @@ const create = async (res, data, model, directReturn = true) => {
     if (directReturn) return tryCatchError(res, error);
   }
 };
-const read = async (res, data, model) => {
+const read = async (res, data, model, populateFields) => {
   try {
-    const items = await model.find();
-    return response(res, 200, { message: "Data Fetched!", items });
-  } catch (error) {
-    return tryCatchError(res, error);
-  }
-};
-const readBy = async (res, query, model) => {
-  try {
-    const items = await model.find(query);
-    return response(res, 200, { message: "Data Fetched!", items });
-  } catch (error) {
-    return tryCatchError(res, error);
-  }
-};
+    let query = model.find();
 
+    if (Array.isArray(populateFields) && populateFields.length > 0) {
+      populateFields.forEach((field) => {
+        query = query.populate(field);
+      });
+    }
+
+    const items = await query;
+    return response(res, 200, { message: "Data Fetched!", items });
+  } catch (error) {
+    return tryCatchError(res, error);
+  }
+};
+const readBy = async (res, query, model, populateFields = []) => {
+  try {
+    let itemsQuery = model.find(query);
+
+    if (Array.isArray(populateFields) && populateFields.length > 0) {
+      populateFields.forEach((field) => {
+        itemsQuery = itemsQuery.populate(field);
+      });
+    }
+
+    const items = await itemsQuery;
+    return response(res, 200, { message: "Data Fetched!", items });
+  } catch (error) {
+    return tryCatchError(res, error);
+  }
+};
+const readTotal = async (res, model, query = {}) => {
+  try {
+    const totalItems = await model.countDocuments(query);
+
+    return response(res, 200, { message: "Data Fetched!", totalItems });
+  } catch (error) {
+    return tryCatchError(res, error);
+  }
+};
 const readOne = async (res, data, model) => {
   try {
     const { id } = data;
@@ -77,8 +102,21 @@ const pushUpdate = async (
         return response(res, 409, { message: "Id not received" });
       else return { message: "Id not received", status: 409 };
     }
-
+    if (!data || !pushTo) {
+      if (directReturn)
+        return response(res, 409, {
+          message:
+            "Either Data to push or field where data is being pushed is missing",
+        });
+      else
+        return {
+          message:
+            "Either Data to push or field where data is being pushed is missing",
+          status: 409,
+        };
+    }
     const item = await model.findById(id);
+    console.log(item);
     if (!item) {
       if (directReturn)
         return response(res, 404, { message: "Item not found" });
@@ -105,10 +143,17 @@ const pullUpdate = async (
   directReturn = true
 ) => {
   try {
-    if (!id) return response(res, 409, { message: "Id not received" });
+    if (!id)
+      if (directReturn)
+        return response(res, 409, { message: "Id not received" });
+      else return { message: "Id not received", status: 409, success: false };
 
     const item = await model.findById(id);
-    if (!item) return response(res, 404, { message: "Item not found" });
+
+    if (!item)
+      if (directReturn)
+        return response(res, 404, { message: "Item not found" });
+      else return { message: "Item not found", status: 404, success: false };
 
     const updateQuery = { $pull: { [pullFrom]: data } };
     const updatedItem = await model.findByIdAndUpdate(id, updateQuery, {
@@ -117,7 +162,7 @@ const pullUpdate = async (
 
     if (directReturn)
       return response(res, 200, { message: "Data Updated!", updatedItem });
-    else return;
+    else return { success: true };
   } catch (error) {
     return tryCatchError(res, error);
   }
@@ -184,4 +229,5 @@ module.exports = {
   readBy,
   deleteManyItems,
   deletingImages,
+  readTotal,
 };
